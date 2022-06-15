@@ -4,19 +4,49 @@
  */
 package com.mycompany.topic1;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Lenovo
  */
 public class CustomerMenu extends javax.swing.JFrame {
+    ArrayList<Customer> cust;
 
     /**
      * Creates new form CustomerMenu
      */
     public CustomerMenu() {
         initComponents();
+        cust=new ArrayList<>();
+        populateArrayList();
     }
-
+    public void populateArrayList()
+    {
+        try{
+            FileInputStream file = new FileInputStream("Customer.dat");
+            ObjectInputStream inputFile = new ObjectInputStream(file);
+            
+            boolean endOfFile=false;
+            while(!endOfFile){
+                try{
+                    cust.add((Customer)inputFile.readObject());
+                }catch(IOException e){
+                    endOfFile=true;
+                }catch(Exception f){
+                    JOptionPane.showMessageDialog(null,f.getMessage());
+                }
+            }
+            inputFile.close();
+            
+        }catch(IOException e){
+            JOptionPane.showMessageDialog(null,e.getMessage());
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
