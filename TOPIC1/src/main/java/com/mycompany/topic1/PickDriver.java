@@ -155,7 +155,7 @@ public class PickDriver extends javax.swing.JFrame {
                     
                     String EATstr = String.format("%02d%02d", h, m);
                     
-                    if(totalCustTime+5>EAT && driver.get(i).getCapacity()>=cust.get(cust.size()-1).getCustCapacity()){
+                    if(totalCustTime+5>EAT && driver.get(i).getCapacity()>=cust.get(cust.size()-1).getCustCapacity() && driver.get(i).getStatus().equalsIgnoreCase("Available")){
                         driver.get(i).setEAT(EATstr);
                         custChoose.add(driver.get(i));
                     }
@@ -306,48 +306,12 @@ public class PickDriver extends javax.swing.JFrame {
     }//GEN-LAST:event_DriverActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try {
-            int driverIndex= Driver.getSelectedIndex();
-            Driver selectedDriver=custChoose.get(driverIndex);
-            
-            selectedDriver.setStatus("Unavailable");
-            selectedDriver.setCust(cust.get(cust.size()-1).getName());
-            cust.get(cust.size()-1).setStatus("Waiting");
-            
-            Timer timer= new Timer();
-            int driverToCust=getTimeTakenSec(selectedDriver.getCurrLocation(),cust.get(cust.size()-1).getStart());
-            int totalDistance=driverToCust+getTimeTakenSec(cust.get(cust.size()-1).getStart(),cust.get(cust.size()-1).getDestination());
-            TimerTask updateTask = new TimerTask(){
-                int dtc=driverToCust;
-                int totalD=totalDistance;
-                @Override
-                public void run() {
-                    dtc--;
-                    totalD--;
-                    if(dtc==0){
-                        cust.get(cust.size()-1).setStatus("Picked");  
-                        selectedDriver.setCurrLocation(new Location(cust.get(cust.size()-1).getStart()));
-                    }
-                    if(totalD==0){
-                        cust.get(cust.size()-1).setStatus("Reached");
-                        
-                        selectedDriver.setStatus("Available");
-                        selectedDriver.setCust("");
-                        selectedDriver.setCurrLocation(new Location(cust.get(cust.size()-1).getDestination()));
-                        
-                    }
-                    saveDriverToFile();
-                    saveCustomerToFile();
-                }
-            };
-            timer.scheduleAtFixedRate(updateTask,0,1000);//start schedule
-            
-            JOptionPane.showMessageDialog(null, "Successfully picked a driver");
-//            this.dispose();
-            //method for set the customer for driver-link selectedDriver with last index of customerlist
-        } catch (Exception ex) {
-            Logger.getLogger(PickDriver.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
+        int driverIndex= Driver.getSelectedIndex();
+        Driver selectedDriver=custChoose.get(driverIndex);
+        Customer selectedCustomer=cust.get(cust.size()-1);
+        UpdateTask ut= new UpdateTask(selectedDriver,selectedCustomer);
+        
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
